@@ -1,13 +1,12 @@
+# Sample Azure Speech Service
 
-https://portal.azure.com/
+Ejemplo de uso de la API de Azure Speech Service para conversión de texto a voz y voz a texto.
 
-https://learn.microsoft.com/es-es/azure/ai-services/speech-service/language-support?tabs=tts
+Necesitaremos crear un recurso de Speech Service en el portal de Azure para obtener la clave y la región necesarias para autenticar las solicitudes.
 
-https://github.com/Azure-Samples/cognitive-services-speech-sdk/tree/master
+Para ejecutar el ejemplo, sigue estos pasos:
 
-https://azure.microsoft.com/es-es/pricing/details/cognitive-services/speech-services/
-
-
+[source,bash]
 ----
 python3 -m venv .venv
 
@@ -16,9 +15,18 @@ source .venv/bin/activate
 pip install -r requirements.txt
 
 export SPEECH_KEY="your_key_here"
+
 export SPEECH_REGION="your_region_here"
 
 python3 sample-text-to-speech.py
 
 python3 sample-speech-to-text.py
 ----
+
+
+## References
+
+- https://portal.azure.com/
+- https://learn.microsoft.com/es-es/azure/ai-services/speech-service/language-support?tabs=tts
+- https://github.com/Azure-Samples/cognitive-services-speech-sdk/tree/master
+- https://azure.microsoft.com/es-es/pricing/details/cognitive-services/speech-services/
