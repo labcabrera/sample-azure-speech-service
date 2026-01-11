@@ -1,0 +1,24 @@
+
+https://portal.azure.com/
+
+https://learn.microsoft.com/es-es/azure/ai-services/speech-service/language-support?tabs=tts
+
+https://github.com/Azure-Samples/cognitive-services-speech-sdk/tree/master
+
+https://azure.microsoft.com/es-es/pricing/details/cognitive-services/speech-services/
+
+
+----
+python3 -m venv .venv
+
+source .venv/bin/activate
+
+pip install -r requirements.txt
+
+export SPEECH_KEY="your_key_here"
+export SPEECH_REGION="your_region_here"
+
+python3 sample-text-to-speech.py
+
+python3 sample-speech-to-text.py
+----
