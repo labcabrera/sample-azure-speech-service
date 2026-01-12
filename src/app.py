@@ -18,7 +18,7 @@ openapi_tags = [
 ]
 
 app = FastAPI(
-	title="Sample Azure Speech Service",
+	title="Azure Speech API",
 	description="API REST que expone operaciones de reconocimiento y síntesis de voz basadas en Azure Speech.",
 	version="0.1.0",
 	openapi_url="/api/v1/openapi.json",

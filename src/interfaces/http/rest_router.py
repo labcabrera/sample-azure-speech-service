@@ -9,28 +9,15 @@ from fastapi import APIRouter, UploadFile, File, Form, HTTPException
 from fastapi.responses import StreamingResponse, JSONResponse
 from pydantic import BaseModel
 
-
-# Import adapter (try package-style import, fallback to relative)
-try:
-    from src.infrastructure.interfaces.adapters.azure_speech_service_adapter import AzureSpeechServiceAdapter
-except Exception:
-    try:
-        from src.infrastructure.interfaces.adapters.azure_speech_service_adapter import AzureSpeechServiceAdapter
-    except Exception:
-        raise
-
+from src.infrastructure.interfaces.adapters.azure_speech_service_adapter import AzureSpeechServiceAdapter
 
 rest_router = APIRouter()
-
-# Initialize adapter (reads SPEECH_KEY / SPEECH_REGION from env if not provided)
 adapter = AzureSpeechServiceAdapter()
-
 
 class TTSRequest(BaseModel):
     text: str
     voice: str = "es-ES-ElviraNeural"
     format: str = "mp3"
-
 
 @rest_router.post(
     "/api/v1/speech-to-text",
