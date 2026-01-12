@@ -1,1 +1,3 @@
 azure-cognitiveservices-speech
+fastapi
+uvicorn[standard]
