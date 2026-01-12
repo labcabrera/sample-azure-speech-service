@@ -32,7 +32,12 @@ class TTSRequest(BaseModel):
     format: str = "mp3"
 
 
-@rest_router.post("/api/v1/speech-to-text")
+@rest_router.post(
+    "/api/v1/speech-to-text",
+    tags=["Speech"],
+    summary="Transcribe audio a texto",
+    operation_id="speech_to_text",
+)
 async def speech_to_text(file: UploadFile = File(...), assumed_format: Optional[str] = Form("wav")):
     """Recibe un fichero de audio y devuelve la transcripción.
 
@@ -51,7 +56,12 @@ async def speech_to_text(file: UploadFile = File(...), assumed_format: Optional[
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@rest_router.post("/api/v1/text-to-speech")
+@rest_router.post(
+    "/api/v1/text-to-speech",
+    tags=["Speech"],
+    summary="Sintetiza texto a audio",
+    operation_id="text_to_speech",
+)
 async def text_to_speech(req: TTSRequest):
     """Recibe JSON con `text`, `voice` y `format` y devuelve el audio sintetizado como stream."""
     suffix = ".mp3" if req.format.lower() == "mp3" else ".wav"
