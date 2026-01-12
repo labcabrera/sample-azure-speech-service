@@ -6,7 +6,7 @@ from typing import Optional, Iterable
 import azure.cognitiveservices.speech as speechsdk
 
 try:
-	from ....application.ports.speech_port import SpeechPort
+	from ...application.ports.speech_port import SpeechPort
 except Exception:
 	# Fallback when module executed as script or package layout differs
 	try:
@@ -117,6 +117,28 @@ class SpeechService:
 			raise RuntimeError(f"TTS canceled: {getattr(cd, 'reason', None)} - {getattr(cd, 'error_details', None)}")
 
 
+	def text_to_stream(self, text: str, voice: str, format: str = "mp3") -> io.BytesIO:
+		"""Sintetiza `text` y devuelve un `BytesIO` con el audio generado.
+
+		Por robustez se reutiliza la implementación de fichero temporal y luego
+		se devuelve el contenido en memoria como `io.BytesIO`.
+		"""
+		suffix = ".mp3" if format.lower() == "mp3" else ".wav"
+		with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
+			out_name = tmp.name
+
+		try:
+			self.text_to_file(text, voice, out_name)
+			with open(out_name, "rb") as fh:
+				data = fh.read()
+			return io.BytesIO(data)
+		finally:
+			try:
+				os.unlink(out_name)
+			except Exception:
+				pass
+
+
 class AzureSpeechServiceAdapter(SpeechPort):
 	"""Adaptador de infraestructura para Azure Speech que implementa el port `SpeechPort`.
 
@@ -135,4 +157,7 @@ class AzureSpeechServiceAdapter(SpeechPort):
 
 	def text_to_file(self, text: str, voice: str, out_filename: str) -> None:
 		return self._svc.text_to_file(text, voice, out_filename)
+
+	def text_to_stream(self, text: str, voice: str, format: str = "mp3") -> io.BytesIO:
+		return self._svc.text_to_stream(text, voice, format=format)
 

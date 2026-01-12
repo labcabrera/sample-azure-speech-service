@@ -9,7 +9,7 @@ from fastapi import APIRouter, UploadFile, File, Form, HTTPException
 from fastapi.responses import StreamingResponse, JSONResponse
 from pydantic import BaseModel
 
-from src.infrastructure.interfaces.adapters.azure_speech_service_adapter import AzureSpeechServiceAdapter
+from src.infrastructure.adapters.azure_speech_service_adapter import AzureSpeechServiceAdapter
 
 rest_router = APIRouter()
 adapter = AzureSpeechServiceAdapter()
@@ -51,28 +51,19 @@ async def speech_to_text(file: UploadFile = File(...), assumed_format: Optional[
 )
 async def text_to_speech(req: TTSRequest):
     """Recibe JSON con `text`, `voice` y `format` y devuelve el audio sintetizado como stream."""
-    suffix = ".mp3" if req.format.lower() == "mp3" else ".wav"
-    with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
-        out_name = tmp.name
-
     try:
-        adapter.text_to_file(req.text, req.voice, out_name)
+        stream = adapter.text_to_stream(req.text, req.voice, format=req.format)
 
-        def iterfile(path: str):
-            with open(path, "rb") as fh:
-                while True:
-                    chunk = fh.read(8192)
-                    if not chunk:
-                        break
-                    yield chunk
+        def iter_bytes(io_stream: io.BytesIO):
+            io_stream.seek(0)
+            while True:
+                chunk = io_stream.read(8192)
+                if not chunk:
+                    break
+                yield chunk
 
-        media_type = "audio/mpeg" if suffix == ".mp3" else "audio/wav"
-        headers = {"Content-Disposition": f"attachment; filename=output{suffix}"}
-        return StreamingResponse(iterfile(out_name), media_type=media_type, headers=headers)
+        media_type = "audio/mpeg" if req.format.lower() == "mp3" else "audio/wav"
+        headers = {"Content-Disposition": f"attachment; filename=output.{req.format.lower()}"}
+        return StreamingResponse(iter_bytes(stream), media_type=media_type, headers=headers)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-    finally:
-        try:
-            os.unlink(out_name)
-        except Exception:
-            pass
