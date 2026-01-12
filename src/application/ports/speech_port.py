@@ -44,3 +44,12 @@ class SpeechPort(ABC):
         - `format`: hint para el formato de salida (por ejemplo "mp3" o "wav").
         Debe devolver un file-like binario (por ejemplo `io.BytesIO`).
         """
+
+    @abstractmethod
+    def available_voices(self, language_code: Optional[str] = None) -> Optional[list]:
+        """Devuelve la lista de voces disponibles.
+
+        - `language_code`: si se proporciona, filtra por código de idioma (p.ej. 'es', 'ca').
+        Devuelve una lista de diccionarios con claves `name`, `locale`, `gender` y `voice_type`.
+        """
+    

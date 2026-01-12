@@ -1,8 +1,6 @@
 from __future__ import annotations
 
 import io
-import os
-import tempfile
 from typing import Optional
 
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException
