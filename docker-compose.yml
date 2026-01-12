@@ -1,0 +1,10 @@
+version: '3.8'
+services:
+  speech-api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - SPEECH_KEY
+      - SPEECH_REGION
+    restart: unless-stopped
