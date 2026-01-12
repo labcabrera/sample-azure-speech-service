@@ -5,15 +5,7 @@ from typing import Optional, Iterable
 
 import azure.cognitiveservices.speech as speechsdk
 
-try:
-	from ...application.ports.speech_port import SpeechPort
-except Exception:
-	# Fallback when module executed as script or package layout differs
-	try:
-		from src.application.ports.speech_port import SpeechPort
-	except Exception:
-		SpeechPort = object
-
+from application.ports.speech_port import SpeechPort
 
 def _get_speech_config(speech_key: Optional[str] = None, region_or_endpoint: Optional[str] = None) -> speechsdk.SpeechConfig:
 	key = speech_key or os.environ.get('SPEECH_KEY')
@@ -138,8 +130,35 @@ class SpeechService:
 			except Exception:
 				pass
 
+	def available_voices(self, language_code: Optional[str] = None) -> Optional[list]:
+		"""Recupera la lista de voces disponibles desde Azure Speech.
 
-class AzureSpeechServiceAdapter(SpeechPort):
+		- `language_code`: filtro opcional por código de idioma (p.ej. 'es', 'ca').
+		Devuelve una lista de dicts: `{name, locale, gender, voice_type}`.
+		"""
+		try:
+			synthesizer = speechsdk.SpeechSynthesizer(speech_config=self.speech_config, audio_config=None)
+			voices_result = synthesizer.get_voices_async().get()
+			if voices_result.reason == speechsdk.ResultReason.VoicesListRetrieved:
+				voices = []
+				for v in voices_result.voices:
+					if language_code:
+						if not v.locale.startswith(language_code):
+							continue
+					voices.append({
+						"name": v.name,
+						"locale": v.locale,
+						"gender": getattr(v, 'gender').name if hasattr(v, 'gender') else None,
+						"voice_type": getattr(v, 'voice_type').name if hasattr(v, 'voice_type') else None,
+					})
+				return voices
+			else:
+				return []
+		except Exception:
+			return []
+
+
+class AzureSpeechServiceAdapter:
 	"""Adaptador de infraestructura para Azure Speech que implementa el port `SpeechPort`.
 
 	Esta clase delega en la implementación local `SpeechService` y adapta
@@ -160,4 +179,7 @@ class AzureSpeechServiceAdapter(SpeechPort):
 
 	def text_to_stream(self, text: str, voice: str, format: str = "mp3") -> io.BytesIO:
 		return self._svc.text_to_stream(text, voice, format=format)
+
+	def available_voices(self, language_code: Optional[str] = None) -> Optional[list]:
+		return self._svc.available_voices(language_code=language_code)
 

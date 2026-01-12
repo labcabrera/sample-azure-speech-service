@@ -52,4 +52,55 @@ class SpeechPort(ABC):
         - `language_code`: si se proporciona, filtra por código de idioma (p.ej. 'es', 'ca').
         Devuelve una lista de diccionarios con claves `name`, `locale`, `gender` y `voice_type`.
         """
-    
+        # Intentar leer una lista pre-generada desde el fichero `available-voices.txt` en la raíz del repo.
+        import re
+        from pathlib import Path
+
+        repo_root = Path(__file__).resolve().parents[2]
+        voices_file = repo_root / 'available-voices.txt'
+        if not voices_file.exists():
+            return None
+
+        voices = []
+        section = None
+        entry_re = re.compile(r"^-\s*(?P<display>.*?)\s*\((?P<locale1>[^,]+),\s*(?P<name>[^)]+)\)\s*\((?P<locale2>[^)]+)\)\s*-\s*(?P<gender>[^-]+)\s*-\s*(?P<voice_type>\S+)")
+        for line in voices_file.read_text(encoding='utf-8').splitlines():
+            line = line.strip()
+            if line.startswith("Available voices for language"):
+                # extraer código de idioma si está presente
+                m = re.search(r"'(?P<lang>[^']+)'", line)
+                section = m.group('lang') if m else None
+                continue
+            if not line.startswith("-"):
+                continue
+            m = entry_re.match(line)
+            if not m:
+                # fallback: intentar parseo simple
+                parts = [p.strip() for p in line.lstrip('-').split(' - ')]
+                if not parts:
+                    continue
+                display = parts[0]
+                voices.append({
+                    'name': display,
+                    'locale': section,
+                    'gender': parts[1] if len(parts) > 1 else None,
+                    'voice_type': parts[2] if len(parts) > 2 else None,
+                })
+                continue
+
+            name = m.group('name').strip()
+            locale = m.group('locale2').strip()
+            gender = m.group('gender').strip()
+            voice_type = m.group('voice_type').strip()
+            # si se solicitó filtro por idioma, comprobar
+            if language_code and not locale.startswith(language_code):
+                continue
+            voices.append({
+                'name': name,
+                'locale': locale,
+                'gender': gender,
+                'voice_type': voice_type,
+            })
+
+        return voices
+

@@ -65,3 +65,21 @@ async def text_to_speech(req: TTSRequest):
         return StreamingResponse(iter_bytes(stream), media_type=media_type, headers=headers)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@rest_router.get(
+    "/api/v1/voices",
+    tags=["Speech"],
+    summary="Lista las voces disponibles",
+    operation_id="available_voices",
+)
+async def available_voices(language: Optional[str] = None):
+    """Devuelve las voces disponibles. Query param `language` filtra por código (ej. 'es')."""
+    try:
+        voices = adapter.available_voices(language)
+        if voices is None:
+            # No hay fichero local y la operación puede no ser aplicable
+            return JSONResponse(status_code=204, content={})
+        return {"voices": voices}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
