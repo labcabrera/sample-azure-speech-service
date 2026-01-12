@@ -1,10 +1,10 @@
-# Sample Azure Speech Service
+# Azure Speech API
 
-Ejemplo de uso de la API de Azure Speech Service para conversión de texto a voz y voz a texto.
+API básica para la integración con Azure Speech Service.
 
 Necesitaremos crear un recurso de Speech Service en el portal de Azure para obtener la clave y la región necesarias para autenticar las solicitudes.
 
-Para ejecutar el ejemplo, sigue estos pasos:
+Para ejecutar la API, sigue estos pasos:
 
 [source,bash]
 ----
@@ -18,11 +18,34 @@ export SPEECH_KEY="your_key_here"
 
 export SPEECH_REGION="your_region_here"
 
-python3 sample-text-to-speech.py
-
-python3 sample-speech-to-text.py
+uvicorn src.app:app --reload --port 8000
 ----
 
+## Ejemplos de uso
+
+### Text to Speech
+
+[source,bash]
+----
+curl -X POST http://localhost:8000/api/v1/text-to-speech \
+  -H "Content-Type: application/json" \
+  -d '{
+    "text": "Hola, este es un ejemplo de conversión de texto a voz",
+    "language": "es-ES",
+    "voice": "es-ES-ElviraNeural"
+  }' \
+  --output output.mp3
+----
+
+### Speech to Text
+
+[source,bash]
+----
+curl -X POST http://localhost:8000/api/v1/speech-to-text \
+  -H "Content-Type: multipart/form-data" \
+  -F "file=@output.mp3" \
+  -F "language=es-ES"
+----
 
 ## References
 

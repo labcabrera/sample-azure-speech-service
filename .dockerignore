@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
+ENV/
+.env
+output/
+samples/
+*.sqlite3
+__pypackages__/
+dist/
+build/
+.git/
+*.egg-info/
