@@ -1,11 +1,10 @@
 import os
 import io
 import tempfile
-from typing import Optional, Iterable
-
 import azure.cognitiveservices.speech as speechsdk
 
-from application.ports.speech_port import SpeechPort
+from typing import Optional, Iterable
+from src.application.ports.speech_port import SpeechPort
 
 def _get_speech_config(speech_key: Optional[str] = None, region_or_endpoint: Optional[str] = None) -> speechsdk.SpeechConfig:
 	key = speech_key or os.environ.get('SPEECH_KEY')

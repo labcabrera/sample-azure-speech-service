@@ -13,7 +13,7 @@ rest_router = APIRouter()
 adapter = AzureSpeechServiceAdapter()
 
 class TTSRequest(BaseModel):
-    text: str
+    text: str = "Va a subir la marea, y se lo va a llevar todo\nNo veas si noto la fuerza\nYo creo que soy un toro\n\nDate prisa, que ya está aquí\nHay tormenta y yo me tiro al mar\nMe abandono no me voy a ahogar\nY ahora arriba soy el huracán"
     voice: str = "es-ES-ElviraNeural"
     format: str = "mp3"
 
