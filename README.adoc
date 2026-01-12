@@ -21,6 +21,8 @@ export SPEECH_REGION="your_region_here"
 python3 sample-text-to-speech.py
 
 python3 sample-speech-to-text.py
+
+uvicorn src.app:app --reload --port 8000
 ----
 
 

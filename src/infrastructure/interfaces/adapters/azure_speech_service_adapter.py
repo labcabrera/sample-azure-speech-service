@@ -6,7 +6,7 @@ from typing import Optional, Iterable
 import azure.cognitiveservices.speech as speechsdk
 
 try:
-	from ..application.ports.speech_port import SpeechPort
+	from ....application.ports.speech_port import SpeechPort
 except Exception:
 	# Fallback when module executed as script or package layout differs
 	try:
